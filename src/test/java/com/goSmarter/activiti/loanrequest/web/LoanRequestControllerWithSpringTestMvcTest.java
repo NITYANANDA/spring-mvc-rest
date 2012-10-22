@@ -16,7 +16,6 @@ import static org.springframework.test.web.server.request.MockMvcRequestBuilders
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
 
-import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -25,22 +24,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.server.MockMvc;
 import org.springframework.test.web.server.setup.MockMvcBuilders;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter;
+import org.springframework.test.context.support.XmlWebContextLoader;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.goSmarter.activiti.loanrequest.domain.LoanRequest;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(loader = WebContextLoader.class, value = {
+@WebAppConfiguration
+@ContextConfiguration(loader = XmlWebContextLoader.class , value = {
 		"classpath:META-INF/spring/applicationContext.xml",
 		"classpath:META-INF/spring/test-datasource-config.xml"})
 public class LoanRequestControllerWithSpringTestMvcTest {
@@ -80,10 +76,17 @@ public class LoanRequestControllerWithSpringTestMvcTest {
 		String jsonPcUser = mapper.writeValueAsString(loanRequest);
 
 		logger.debug(jsonPcUser);
-		mockMvc.perform(
+/*		mockMvc.perform(
 				post("/loanrequests/create/" + jsonPcUser)
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON)).andExpect(
 				status().isOk());
+*/
+		mockMvc.perform(
+				post("loanrequests")
+				.body(jsonPcUser.getBytes())
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON)).andExpect(
+				status().isCreated());
 	}
 }
